@@ -1,237 +1,140 @@
-package tictactoe;
+package bullscows;
 
-import java.util.Arrays;
+import java.util.InputMismatchException;
+import java.util.Random;
 import java.util.Scanner;
 
 public class Main {
     static Scanner scanner = new Scanner(System.in);
+    static Random random = new Random();
 
     public static void main(String[] args) {
-        char[][] grid = gridInput();
-        gridOutput(grid);
-        boolean whoWin = whoWin(grid);
-        // System.out.println(whoWin);
-        boolean flag2 = true;
-        while (whoWin) {
-            moveX(grid, flag2);
-            gridOutput(grid);
-            boolean whoWinX = whoWin(grid);
-            if ( whoWinX == false) {
-                break;
-            }
-            moveO(grid, flag2);
-            gridOutput(grid);
-            whoWin = whoWin(grid);
+        System.out.println("Please, enter the secret code's length:");
+        String strLength = scanner.nextLine();
+        int length = 0;
+        try {
+            length = Integer.parseInt(strLength);
+        } catch (NumberFormatException e) {
+            System.out.println("Error: " + strLength + " isn't a valid number.");
+            System.exit(0);
         }
-    }
-
-    public static char[][] gridInput() {
-        char[][] grid = new char[3][3];
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                grid[i][j] = '_';
-            }
-
-        }
-        return grid;
-    }
-
-    public static void gridOutput(char[][] grid) {
-        System.out.println("---------");
-        for (int i = 0; i < 3; i++) {
-            System.out.print("| ");
-            for (int j = 0; j < 3; j++) {
-                if (grid[i][j] != '_') {
-                    System.out.print(grid[i][j] + " ");
-                } else if (grid[i][j] == '_') {
-                    System.out.print("  ");
-                }
-            }
-            System.out.println("|");
-        }
-        System.out.println("---------");
-    }
-
-    public static boolean whoWin(char[][] grid) {
-        int counterX = 0;
-        int counterO = 0;
-
-        int totalCounterX = 0;
-        int totalCounterO = 0;
-
-        int pointX = 0;
-        int pointO = 0;
-
-        boolean isGameFinish = true;
-        boolean isPossibleChar = true;
-        boolean isPossibleMove = true;
-
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                if (grid[i][j] == 'X') {
-                    counterX += 1;
-                    totalCounterX++;
-                } else if (grid[i][j] == 'O') {
-                    counterO += 1;
-                    totalCounterO++;
-                } else if (grid[i][j] == '_') {
-                    isGameFinish = false;
-                } else {
-                    isPossibleChar = false;
-                }
-            }
-            if (counterX == 3) {
-                pointX += 1;
-            }
-            if (counterO == 3) {
-                pointO += 1;
-            }
-            counterX = 0;
-            counterO = 0;
-        }
-
-        int[] whoWinDiagonal = whoWinDiagonal(grid);
-        int[] whoWinColumn = whoWinColumn(grid);
-
-        pointX = pointX + whoWinColumn[0] + whoWinDiagonal[0];
-        pointO = pointO + whoWinColumn[1] + whoWinDiagonal[1];
-
-        if (Math.abs(totalCounterX - totalCounterO) > 1) {
-            isPossibleMove = false;
-        }
-
-        if (pointX > pointO && isPossibleChar && isPossibleMove) {
-            System.out.println("X wins");
-            return false;
-        } else if (pointO > pointX && isPossibleChar && isPossibleMove) {
-            System.out.println("O wins");
-            return false;
-        } else if (pointX == 0 && pointO == 0 && isGameFinish && isPossibleMove) {
-            System.out.println("Draw");
-            return false;
-        } else if (isPossibleChar && !isGameFinish && isPossibleMove) {
-            return true;
-        } else if (isPossibleChar) {
-            System.out.println("Impossible");
-            return false;
-        } else if (!isPossibleMove) {
-            System.out.println("Impossible");
-            return false;
+        System.out.println("Input the number of possible symbols in the code:");
+        int possibleCharacter = scanner.nextInt();
+        if (length > possibleCharacter) {
+            System.out.println("Error: it's not possible to generate a code with a length of " + length + " with "+ possibleCharacter + " unique symbols.");
+            System.exit(0);
+        } else if (possibleCharacter > 36) {
+            System.out.println("Error: maximum number of possible symbols in the code is 36 (0-9, a-z).");
+            System.exit(0);
         } else {
-            System.out.println("Impossible");
-            return false;
+            String secretCode = secretNUmber(length, possibleCharacter);
+            grade(secretCode, length);
         }
     }
 
-    public static int[] whoWinDiagonal(char[][] grid) {
-        int counterX1 = 0;
-        int counterO1 = 0;
-
-        int counterX2 = 0;
-        int counterO2 = 0;
-
-        int[] point = new int[2];
-
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                if (i == j && grid[i][j] == 'X') {
-                    counterX1++;
-                } else if (i == j && grid[i][j] == 'O') {
-                    counterO1++;
+    public static String secretNUmber(int length, int possibleCharacter) {
+        StringBuilder secretNumber = new StringBuilder("");
+        if (length > 36 | length <= 0) {
+            StringBuilder errorMessage = new StringBuilder("Error");
+            System.out.println(errorMessage);
+            System.exit(0);
+            return "Error";
+        } else {
+            boolean flag2 = true;
+            while (flag2) {
+                StringBuilder str = new StringBuilder("");
+                String[] strArray = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "g", "h","ı", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z" };
+                for (int i = 0; i < length; i++) {
+                    int f = random.nextInt(possibleCharacter) + 0;
+                    str.append(strArray[f]);
                 }
-                if (i + j == 2 && grid[i][j] == 'X') {
-                    counterX2++;
-                } else if (i + j == 2 && grid[i][j] == 'O') {
-                    counterO2++;
+                String pseudoRandomNumericString = str.toString();
+                int pseudoRandomNumberLength = pseudoRandomNumericString.length();
+                for (int i = 0; i < pseudoRandomNumberLength; i++) {
+                    boolean flag = true;
+                    int secretNumberLength = secretNumber.length();
+                    for (int j = 0; j < secretNumberLength; j++) {
+                        if (pseudoRandomNumericString.charAt(i) == secretNumber.charAt(j)) {
+                            flag = false;
+                        }
+                    }
+                    if (flag && secretNumber.length() < length) {
+                        secretNumber.append(pseudoRandomNumericString.charAt(i));
+                    }
                 }
-            }
-        }
-        if (counterX1 == 3) {
-            point[0] += 1;
-        }
-        if (counterO1 == 3) {
-            point[1] += 1;
-        }
-        if (counterX2 == 3) {
-            point[0] += 1;
-        }
-        if (counterO2 == 3) {
-            point[1] += 1;
-        }
-        return point;
-
-    }
-
-    public static int[] whoWinColumn(char[][] grid) {
-        int counterX = 0;
-        int counterO = 0;
-
-        int[] point = new int[2];
-
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                if (grid[j][i] == 'X') {
-                    counterX += 1;
-                }
-                if (grid[j][i] == 'O') {
-                    counterO += 1;
-                }
-            }
-            if (counterX == 3) {
-                point[0] += 1;
-            }
-            if (counterO == 3) {
-                point[1] += 1;
-            }
-            counterX = 0;
-            counterO = 0;
-        }
-        return point;
-    }
-
-    public static void moveX(char[][] grid, boolean flag) {
-        while (flag) {
-            System.out.print("Enter the coordinates:");
-            String[] move = scanner.nextLine().strip().split(" ");
-            try {
-                int moveRow = Integer.parseInt(move[0]);
-                int moveColumn = Integer.parseInt(move[1]);
-                if (1 <= moveRow && moveRow <= 3 && 1 <= moveColumn && moveColumn <= 3 && grid[moveRow - 1][moveColumn - 1] == '_') {
-                    grid[moveRow - 1][moveColumn - 1] = 'X';
-                    flag = false;
-                } else if (1 <= moveRow && moveRow <= 3 && 1 <= moveColumn && moveColumn <= 3 && grid[moveRow - 1][moveColumn - 1] != ' ') {
-                    System.out.println("This cell is occupied! Choose another one!");
-                    flag = true;
+                String secretCode = secretNumber.toString();
+                if (secretCode.length() == length && secretCode.charAt(0) != '0') {
+                    if (possibleCharacter <= 10) {
+                        System.out.println("The secret is prepared: "+ "*".repeat(length) + " (" + "0-" + strArray[possibleCharacter - 1] + ")" + ".");
+                    } else {
+                        System.out.println("The secret is prepared: " + "*".repeat(length) +  " (0-9, " + "a-" + strArray[possibleCharacter - 1] + ")" + ".");
+                    }
+                    System.out.println("Okay, let's start a game!");
+                    flag2 = false;
+                    return secretCode;
                 } else {
-                    System.out.println("Coordinates should be from 1 to 3!");
-                    flag = true;
+                    flag2 = true;
                 }
-            } catch (NumberFormatException e) {
-                System.out.println("You should enter numbers!");
-                flag = true;
             }
         }
+        return "Error";
     }
-    public static void moveO(char[][] grid, boolean flag) {
+
+    public static void grade(String number, int length) {
+        boolean flag = true;
+        int counter = 1;
         while (flag) {
-            System.out.print("Enter the coordinates:");
-            String[] move = scanner.nextLine().strip().split(" ");
-            try {
-                int moveRow = Integer.parseInt(move[0]);
-                int moveColumn = Integer.parseInt(move[1]);
-                if (1 <= moveRow && moveRow <= 3 && 1 <= moveColumn && moveColumn <= 3 && grid[moveRow - 1][moveColumn - 1] == '_') {
-                    grid[moveRow - 1][moveColumn - 1] = 'O';
-                    flag = false;
-                } else if (1 <= moveRow && moveRow <= 3 && 1 <= moveColumn && moveColumn <= 3 && grid[moveRow - 1][moveColumn - 1] != '_') {
-                    System.out.println("This cell is occupied! Choose another one!");
-                    flag = true;
-                } else {
-                    System.out.println("Coordinates should be from 1 to 3!");
-                    flag = true;
+            System.out.println("Turn " + counter + ":");
+            String guess = scanner.next();
+            int bulls = 0;
+            int cows = 0;
+            for (int i = 0; i < length; i++) {
+                for (int j = 0; j < length; j++) {
+                    if (guess.charAt(i) == number.charAt(j)) {
+                        if (i == j) {
+                            bulls += 1;
+                        } else {
+                            cows += 1;
+                        }
+                    }
                 }
-            } catch (NumberFormatException e) {
-                System.out.println("You should enter numbers!");
-                flag = true;
+            }
+            if (bulls > 0 && cows > 0 && bulls < length) {
+                if (bulls == 1 && cows == 1) {
+                    System.out.printf("Grade: %d bull and %d cow.\n", bulls, cows);
+                    counter++;
+                } else if (bulls == 1 && cows != 1) {
+                    System.out.printf("Grade: %d bull and %d cows.\n", bulls, cows);
+                    counter++;
+                } else if (bulls != 1 && cows == 1) {
+                    System.out.printf("Grade: %d bulls and %d cow.\n", bulls, cows);
+                    counter++;
+                } else {
+                    System.out.printf("Grade: %d bulls and %d cows.\n", bulls, cows);
+                    counter++;
+                }
+            } else if (bulls > 0 && cows == 0 && bulls < length) {
+                if (bulls == 1) {
+                    System.out.printf("Grade: %d bull.\n", bulls);
+                    counter++;
+                } else {
+                    System.out.printf("Grade: %d bulls.\n", bulls);
+                    counter++;
+                }
+            } else if (bulls == 0 && cows > 0) {
+                if (cows == 1) {
+                    System.out.printf("Grade: %d cows.\n", cows);
+                    counter++;
+                } else {
+                    System.out.printf("Grade: %d cows.\n", cows);
+                    counter++;
+                }
+            } else if (bulls == 0 && cows == 0) {
+                System.out.println("Grade: None.");
+                counter++;
+            } else if (bulls == length) {
+                System.out.printf("Grade: %d bulls\nCongratulations! You guessed the secret code.", length);
+                flag = false;
             }
         }
     }
